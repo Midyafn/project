@@ -16,3 +16,6 @@ textColor = '#273346'
 # Accepted values (serif | sans serif | monospace) 
 # Default: "sans serif"
 font = "monospace"
+
+[server]
+headless = true
