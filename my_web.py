@@ -10,6 +10,7 @@ sns.set_style('darkgrid')
 matplotlib.rcParams['font.size'] = 14
 matplotlib.rcParams['figure.figsize'] = (9, 5)
 matplotlib.rcParams['figure.facecolor'] = '#00000000'
+import keras
 from keras.models import load_model
 warnings.simplefilter(action='ignore', category=FutureWarning)
 from datetime import datetime
