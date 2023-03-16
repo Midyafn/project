@@ -16,6 +16,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 from datetime import datetime
 #import mpld3
 import streamlit.components.v1 as components
+import datetime
 
 
 koneksi_mongodb = "mongodb+srv://midya123:1234567890@cluster0.wsuei7i.mongodb.net/test"
@@ -39,39 +40,59 @@ option = st.sidebar.selectbox(
 )
 
 if option == 'Home' or option == '':
-    st.write("""# Dashboard Prediksi Penyinaran Matahari dan Kecepatan Angin""") #menampilkan halaman utama
-    st.text("Lokasi Pengambilan Sumber Data Penelitian")
+    st.write("""# Prediksi dan Estimasi""")
+    st.write("""### Penyinaran Matahari :mostly_sunny: """) #menampilkan halaman utama
+    st.write("""### Kecepatan Angin :cyclone:""")
+    st.text("Lokasi Pengamatan")
     st.map(df_geo)
     st.text("Stasiun Metereologi Kelas I Ngurah Rai")
 elif option == 'Prediksi Matahari':
     st.title("Prediksi Penyinaran Matahari") #menampilkan judul halaman 
 
+    #download template
+    st.write("prediksi akan dilakukan untuk mengetahui data pada 1 bulan mendatang")
+    st.write("untuk memulai proses prediksi, silahkan download template terlebih dahulu")
+    st.write("mohon mengisi data dengan periode 2 bulan sebelumnya")
+    st.text("") 
+    with open("template_matahari.csv") as file:
+        btn = st.download_button(
+            label="Download template",
+            data=file,
+            file_name="template_matahari.csv",
+            mime="text/csv"
+        )
+
     #upload file
-    uploaded_file = st.file_uploader("Choose a file")
+    st.text("")
+    st.text("")
+
+    uploaded_file = st.file_uploader("silahkan upload template yang telah memuat data yang diperlukan")
     if uploaded_file is not None:
         dataframe = pd.read_csv(uploaded_file)
         st.write("Data telah berhasil di load, berikut adalah data yang digunakan untuk proses prediksi") 
         st.write(dataframe) 
 
         #dataframe['Tanggal'] = pd.to_datetime(dataframe['Tanggal'], format='%d-%m-%Y') 
+        dataframe.columns = ['Tanggal','suhu_max' ,'suhu_avg','hujan','matahari']
         dataframe = dataframe.set_index('Tanggal')
         df2 = dataframe.dropna()
+        #df_angin = df['ff_avg']
 
         #plot df asli
         st.write("Visualisasi Data")
         st.line_chart(df2)
 
         #creating lag 1 and rolling window feature
-        df2['lag_1'] = df2['ss'].shift(1)
-        rolling = df2['ss'].rolling(window=30)
+        df2['lag_1'] = df2['matahari'].shift(1)
+        rolling = df2['matahari'].rolling(window=30)
         rolling_sum = rolling.sum()
         df2 = pd.merge(df2,rolling_sum,on='Tanggal')
         df2 = df2.dropna()
         
         #membagi x dan y
-        from sklearn.model_selection import train_test_split
-        X= df2.drop('ss_x', axis=1)
-        y= df2['ss_x']
+        #from sklearn.model_selection import train_test_split
+        X= df2.drop('matahari_x', axis=1)
+        y= df2['matahari_x']
         
         #minmaxscaler
         from sklearn.preprocessing import MinMaxScaler
@@ -102,31 +123,42 @@ elif option == 'Prediksi Matahari':
         pred = predictions.reshape(-1,1)
         pred = scaler2.inverse_transform(pred)
         
+        #menyimpan data prediksi matahari
+        pred = pd.DataFrame(pred, columns =['prediksi (jam)'])
+
+        year = 2023
+        # loop through all days of the year
+        dates = pd.date_range(start=datetime.date(year, 1, 1), end=datetime.date(year, 12, 31))
+        dates = pd.DataFrame({'Tanggal': dates})
+
+        df_pred =pred.join(dates)
+        df_pred = df_pred.set_index('Tanggal')
+        st.write(df_pred)
 
         #menampilkan hasil prediksi dalam bentuk tabel
         st.header('Prediksi rata-rata harian dengan CNN-BiLSTM')
 
 
-        #menyimpan data aktual matahari
-        df_pred = pd.DataFrame(pred, columns =['prediksi(jam)'])
-
-
         #menampilkan hasil prediksi
+        st.write(df_pred)
         st.write('\n')
         st.subheader('Visualisasi Prediksi Intensitas Penyinaran Matahari')
 
-        chart_width = st.expander(label="chart width").slider("", 10, 32, 14)
+        st.line_chart(df_pred)
 
-        fig2 = plt.figure(figsize = (chart_width,10))
-        plt.plot(df_pred);
+        @st.cache_data
+        def convert_df(df):
+        # IMPORTANT: Cache the conversion to prevent computation on every rerun
+            return df.to_csv().encode('utf-8')
 
-        #st.write(fig2)
-        plt.xlabel('Time')
-        plt.ylabel('Value')
-        plt.legend()
-        st.pyplot(fig2)
+        csv = convert_df(df_pred)
 
-        st.write(df_pred) 
+        st.download_button(
+            label="Download data as CSV",
+            data=csv,
+            file_name='result_matahari.csv',
+            mime='text/csv',
+        ) 
 
     else:
         st.text("Silahkan Upload file")    
@@ -134,14 +166,33 @@ elif option == 'Prediksi Matahari':
 elif option == 'Prediksi Angin':
     st.title("Prediksi Kecepatan Angin") #menampilkan judul halaman 
 
+    #download template
+    st.write("untuk memulai proses prediksi, silahkan download template terlebih dahulu")
+    st.write("mohon mengisi data dengan periode 2 bulan sebelumnya")
+    st.text("") 
+    with open("template_angin.csv") as file:
+        btn = st.download_button(
+            label="Download template",
+            data=file,
+            file_name="template_angin.csv",
+            mime="text/csv"
+        )
+
     #upload file
-    uploaded_file = st.file_uploader("Choose a file")
+    st.text("")
+    st.text("")
+
+    #input year 
+
+
+    uploaded_file = st.file_uploader("silahkan upload template yang telah memuat data yang diperlukan")
     if uploaded_file is not None:
         dataframe = pd.read_csv(uploaded_file)
         st.write("Data telah berhasil di load, berikut adalah data yang digunakan untuk proses prediksi") 
         st.write(dataframe) 
 
         #dataframe['Tanggal'] = pd.to_datetime(dataframe['Tanggal'], format='%d-%m-%Y') 
+        dataframe.columns = ['Tanggal','suhu_max' ,'matahari','angin_max','angin']
         dataframe = dataframe.set_index('Tanggal')
         df2 = dataframe.dropna()
         #df_angin = df['ff_avg']
@@ -151,16 +202,16 @@ elif option == 'Prediksi Angin':
         st.line_chart(df2)
 
         #creating lag 1 and rolling window feature
-        df2['lag_1'] = df2['ff_avg'].shift(1)
-        rolling = df2['ff_avg'].rolling(window=30)
+        df2['lag_1'] = df2['angin'].shift(1)
+        rolling = df2['angin'].rolling(window=30)
         rolling_sum = rolling.sum()
         df2 = pd.merge(df2,rolling_sum,on='Tanggal')
         df2 = df2.dropna()
         
         #membagi x dan y
-        from sklearn.model_selection import train_test_split
-        X= df2.drop('ff_avg_x', axis=1)
-        y= df2['ff_avg_x']
+        #from sklearn.model_selection import train_test_split
+        X= df2.drop('angin_x', axis=1)
+        y= df2['angin_x']
         
         #minmaxscaler
         from sklearn.preprocessing import MinMaxScaler
@@ -181,8 +232,6 @@ elif option == 'Prediksi Angin':
 
         #Loading Model
         model = load_model('fulldata_cnn_bilstm.h5')
-
-
         #Testing Model
         predictions = model.predict(X).flatten()
 
@@ -195,29 +244,54 @@ elif option == 'Prediksi Angin':
         #menampilkan hasil prediksi dalam bentuk tabel
         st.header('Prediksi rata-rata harian dengan CNN-BiLSTM')
 
+        #menyimpan data prediksi
+        pred = pd.DataFrame(pred, columns =['prediksi (m/s)'])
 
-        #menyimpan data aktual matahari
-        df_pred = pd.DataFrame(pred, columns =['prediksi(m/s)'])
+        year = 2023
+        # loop through all days of the year
+        dates = pd.date_range(start=datetime.date(year, 1, 1), end=datetime.date(year, 12, 31))
+        dates = pd.DataFrame({'Tanggal': dates})
 
+        df_pred =pred.join(dates)
+        df_pred = df_pred.set_index('Tanggal')
+        # df_pred = df_pred.iloc[:,[1,0]]
+        # df_pred = df_pred.dropna()
+        # df_pred.columns = ['tanggal','prediksi']
+        st.write(df_pred)
 
-        #menampilkan hasil prediksi
-        st.subheader('Visualisasi Prediksi Intensitas Penyinaran Matahari')
+        # #menampilkan hasil prediksi
+        st.subheader('Visualisasi Prediksi Kecepatan Angin Rata-Rata(m/s)')
 
-        chart_width = st.expander(label="chart width").slider("", 10, 32, 14)
+        # chart_width = st.expander(label="chart width").slider("", 10, 32, 14)
 
-        fig2 = plt.figure(figsize = (chart_width,10))
-        plt.plot(df_pred);
+        # fig2 = plt.figure(figsize = (chart_width,10))
+        # plt.plot(df_pred);
 
-        #st.write(fig2)
-        plt.xlabel('Time')
-        plt.ylabel('Value')
-        plt.legend()
-        st.pyplot(fig2)
+        # st.write(fig2)
+        # plt.xlabel(df_pred['prediksi'])
+        # plt.ylabel(df_pred['Tanggal'])
+        # #plt.legend()
+        # #st.pyplot(fig2)
 
-        st.write(df_pred) 
+        st.write(df_pred)
+        st.line_chart(df_pred)
+
+        @st.cache_data
+        def convert_df(df):
+        # IMPORTANT: Cache the conversion to prevent computation on every rerun
+            return df.to_csv().encode('utf-8')
+
+        csv = convert_df(df_pred)
+
+        st.download_button(
+            label="Download data as CSV",
+            data=csv,
+            file_name='result_angin.csv',
+            mime='text/csv',
+        ) 
 
     else:
-        st.text("Silahkan Upload file") 
+        st.text("") 
 
 elif option == 'Exploratory Data Analysis':
     st.write("""## Visualisasi Data yang Digunakan Pada Proses Training Model""") #menampilkan judul halaman 
@@ -242,15 +316,15 @@ elif option == 'Exploratory Data Analysis':
 
 elif option == 'Estimasi':
     st.write("""## Estimasi Kecepatan Angin""") #menampilkan judul halaman 
-    a = st.number_input('Masukkan Suhu Maksimum', key = "a")
-    b = st.number_input('Masukkan Intensitas Penyinaran Matahari', key = "b")
-    c = st.number_input('Masukkan Maksimum Kecepatan Angin', key = "c")
+    a = st.number_input('Masukkan Suhu Maksimum', key = "a", min_value =26, max_value=40)
+    b = st.number_input('Masukkan Intensitas Penyinaran Matahari', key = "b", max_value=12)
+    c = st.number_input('Masukkan Maksimum Kecepatan Angin', key = "c", max_value=50)
     
     import pickle
     regression = pickle.load(open("C:/python/Model_TA/streamlit/estimasi_angin.pickle", "rb"))
 
     estimation = regression.predict([[a, b, c]])
-    st.text("Hasil Estimasi Kecepatan Angin (m/s) :")
+    st.text("Hasil Estimasi Kecepatan Angin hari berikutnya (m/s) :")
     if a == 0 or b == 0 or c==0:
         st.text("0")
     else:
@@ -260,15 +334,15 @@ elif option == 'Estimasi':
     st.write(""" """) 
     #estimasi matahari dengan suhu maksimum, suhu rata-rata, curah hujan
     st.write("""## Estimasi Intensitas Penyinaran Matahari""") 
-    d = st.number_input('Masukkan Suhu Maksimum', key = "d")
-    e = st.number_input('Masukkan Suhu Rata-Rata', key = "e")
+    d = st.number_input('Masukkan Suhu Maksimum', key = "d", min_value =26, max_value=40)
+    e = st.number_input('Masukkan Suhu Rata-Rata', key = "e", min_value =26, max_value=38)
     f = st.number_input('Masukkan Curah Hujan', key = "f")
     
     import pickle
     regression_sun = pickle.load(open("C:/python/Model_TA/streamlit/estimasi_matahari.pickle", "rb"))
 
     estimation_sun = regression_sun.predict([[d, e, f]])
-    st.text("Hasil Estimasi Penyinaran Matahari(jam) :")
+    st.text("Hasil Estimasi Penyinaran Matahari hari berikutnya (jam) :")
     if d == 0 or e == 0 or f==0:
         st.text("0") 
     else:
