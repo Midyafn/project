@@ -36,13 +36,12 @@ df_geo = pd.DataFrame({'lat': [-8.75000], 'lon': [115.17000]})
 
 option = st.sidebar.selectbox(
     'Silakan pilih:',
-    ('Home','Exploratory Data Analysis','Prediksi Matahari','Prediksi Angin','Estimasi')
+    ('Home','Prediksi Matahari','Prediksi Angin','Estimasi')
 )
 
 if option == 'Home' or option == '':
-    st.write("""# Prediksi dan Estimasi""")
-    st.write("""### Penyinaran Matahari :mostly_sunny: """) #menampilkan halaman utama
-    st.write("""### Kecepatan Angin :cyclone:""")
+    st.title(""":blue[Prediksi dan Estimasi ]""")
+    st.write("""### Penyinaran Matahari:mostly_sunny: & Kecepatan Angin:cyclone:""") #menampilkan halaman utama
     st.text("Lokasi Pengamatan")
     st.map(df_geo)
     st.text("Stasiun Metereologi Kelas I Ngurah Rai")
@@ -50,11 +49,11 @@ elif option == 'Prediksi Matahari':
     st.title("Prediksi Penyinaran Matahari") #menampilkan judul halaman 
 
     #download template
-    st.write("prediksi akan dilakukan untuk mengetahui data pada 1 bulan mendatang")
-    st.write("untuk memulai proses prediksi, silahkan download template terlebih dahulu")
-    st.write("mohon mengisi data dengan periode 2 bulan sebelumnya")
+    st.write("- prediksi yang dilakukan membutuhkan data sebanyak jumlah prediksi yang diinginkan ditambah 1 bulan")
+    st.write("- untuk memulai proses prediksi, silahkan download template terlebih dahulu")
+    st.write("")
     st.text("") 
-    with open("template_matahari.csv") as file:
+    with open("assets/template_matahari.csv") as file:
         btn = st.download_button(
             label="Download template",
             data=file,
@@ -65,6 +64,9 @@ elif option == 'Prediksi Matahari':
     #upload file
     st.text("")
     st.text("")
+
+    #input year 
+    year = st.number_input('Masukkan Tahun Prediksi', key = "a", min_value =2000, max_value=None)
 
     uploaded_file = st.file_uploader("silahkan upload template yang telah memuat data yang diperlukan")
     if uploaded_file is not None:
@@ -112,7 +114,7 @@ elif option == 'Prediksi Matahari':
         X = X.reshape((X.shape[0], n_seq, n_steps, n_features))
 
         #Loading Model
-        model = load_model('new_5feature_cnngru.h5')
+        model = load_model('assets/new_5feature_cnngru.h5')
 
 
         #Testing Model
@@ -126,17 +128,19 @@ elif option == 'Prediksi Matahari':
         #menyimpan data prediksi matahari
         pred = pd.DataFrame(pred, columns =['prediksi (jam)'])
 
-        year = 2023
+        year = year
         # loop through all days of the year
         dates = pd.date_range(start=datetime.date(year, 1, 1), end=datetime.date(year, 12, 31))
         dates = pd.DataFrame({'Tanggal': dates})
 
         df_pred =pred.join(dates)
         df_pred = df_pred.set_index('Tanggal')
-        st.write(df_pred)
 
+        st.write('\n')
+        st.write('\n')
+        st.write('\n')
         #menampilkan hasil prediksi dalam bentuk tabel
-        st.header('Prediksi rata-rata harian dengan CNN-BiLSTM')
+        st.header('Prediksi rata-rata harian dengan CNN-GRU')
 
 
         #menampilkan hasil prediksi
@@ -167,10 +171,11 @@ elif option == 'Prediksi Angin':
     st.title("Prediksi Kecepatan Angin") #menampilkan judul halaman 
 
     #download template
-    st.write("untuk memulai proses prediksi, silahkan download template terlebih dahulu")
-    st.write("mohon mengisi data dengan periode 2 bulan sebelumnya")
+    st.write("- prediksi yang dilakukan membutuhkan data sebanyak jumlah prediksi yang diinginkan ditambah 1 bulan")
+    st.write("- untuk memulai proses prediksi, silahkan download template terlebih dahulu")
+    st.write("")
     st.text("") 
-    with open("template_angin.csv") as file:
+    with open("assets/template_angin.csv") as file:
         btn = st.download_button(
             label="Download template",
             data=file,
@@ -183,6 +188,7 @@ elif option == 'Prediksi Angin':
     st.text("")
 
     #input year 
+    year = st.number_input('Masukkan Tahun Prediksi', key = "a", min_value =2000, max_value=None)
 
 
     uploaded_file = st.file_uploader("silahkan upload template yang telah memuat data yang diperlukan")
@@ -231,7 +237,7 @@ elif option == 'Prediksi Angin':
         X = X.reshape((X.shape[0], n_seq, n_steps, n_features))
 
         #Loading Model
-        model = load_model('fulldata_cnn_bilstm.h5')
+        model = load_model('assets/fulldata_cnn_bilstm.h5')
         #Testing Model
         predictions = model.predict(X).flatten()
 
@@ -240,14 +246,16 @@ elif option == 'Prediksi Angin':
         pred = predictions.reshape(-1,1)
         pred = scaler2.inverse_transform(pred)
         
-
+        st.write("\n")
+        st.write("\n")
+        st.write("\n")
         #menampilkan hasil prediksi dalam bentuk tabel
-        st.header('Prediksi rata-rata harian dengan CNN-BiLSTM')
+        st.header('Prediksi rata-rata harian CNN-BiLSTM')
 
         #menyimpan data prediksi
         pred = pd.DataFrame(pred, columns =['prediksi (m/s)'])
 
-        year = 2023
+        year = year
         # loop through all days of the year
         dates = pd.date_range(start=datetime.date(year, 1, 1), end=datetime.date(year, 12, 31))
         dates = pd.DataFrame({'Tanggal': dates})
@@ -260,7 +268,7 @@ elif option == 'Prediksi Angin':
         st.write(df_pred)
 
         # #menampilkan hasil prediksi
-        st.subheader('Visualisasi Prediksi Kecepatan Angin Rata-Rata(m/s)')
+        st.write('### Visualisasi Prediksi Kecepatan Angin Rata-Rata(m/s)')
 
         # chart_width = st.expander(label="chart width").slider("", 10, 32, 14)
 
@@ -273,7 +281,6 @@ elif option == 'Prediksi Angin':
         # #plt.legend()
         # #st.pyplot(fig2)
 
-        st.write(df_pred)
         st.line_chart(df_pred)
 
         @st.cache_data
@@ -293,24 +300,24 @@ elif option == 'Prediksi Angin':
     else:
         st.text("") 
 
-elif option == 'Exploratory Data Analysis':
-    st.write("""## Visualisasi Data yang Digunakan Pada Proses Training Model""") #menampilkan judul halaman 
+# elif option == 'Exploratory Data Analysis':
+#     st.write("""## Visualisasi Data yang Digunakan Pada Proses Training Model""") #menampilkan judul halaman 
 
-    #membuat variabel chart data yang berisi data dari dataframe
-    #data berupa angka acak yang di-generate menggunakan numpy
-    #data terdiri dari 2 kolom dan 20 baris
-    chart_data1 = pd.DataFrame(df, 
-        columns=['ss'])
-    chart_data2 = pd.DataFrame(df, 
-        columns=['ff_avg']
-    )
+#     #membuat variabel chart data yang berisi data dari dataframe
+#     #data berupa angka acak yang di-generate menggunakan numpy
+#     #data terdiri dari 2 kolom dan 20 baris
+#     chart_data1 = pd.DataFrame(df, 
+#         columns=['ss'])
+#     chart_data2 = pd.DataFrame(df, 
+#         columns=['ff_avg']
+#     )
 
-    st.write("### Keterangan")
-    st.text("ss = Penyinaran Matahari")
-    st.text("ff_avg = Rata-Rata Kecepatan Angin")
-    #menampilkan data dalam bentuk chart
-    st.line_chart(chart_data1)
-    st.line_chart(chart_data2)
+#     st.write("### Keterangan")
+#     st.text("ss = Penyinaran Matahari")
+#     st.text("ff_avg = Rata-Rata Kecepatan Angin")
+#     #menampilkan data dalam bentuk chart
+#     st.line_chart(chart_data1)
+#     st.line_chart(chart_data2)
     
     
 
@@ -321,7 +328,7 @@ elif option == 'Estimasi':
     c = st.number_input('Masukkan Maksimum Kecepatan Angin', key = "c", max_value=50)
     
     import pickle
-    regression = pickle.load(open("C:/python/Model_TA/streamlit/estimasi_angin.pickle", "rb"))
+    regression = pickle.load(open("assets/estimasi_angin.pickle", "rb"))
 
     estimation = regression.predict([[a, b, c]])
     st.text("Hasil Estimasi Kecepatan Angin hari berikutnya (m/s) :")
@@ -339,7 +346,7 @@ elif option == 'Estimasi':
     f = st.number_input('Masukkan Curah Hujan', key = "f")
     
     import pickle
-    regression_sun = pickle.load(open("C:/python/Model_TA/streamlit/estimasi_matahari.pickle", "rb"))
+    regression_sun = pickle.load(open("assets/estimasi_matahari.pickle", "rb"))
 
     estimation_sun = regression_sun.predict([[d, e, f]])
     st.text("Hasil Estimasi Penyinaran Matahari hari berikutnya (jam) :")
