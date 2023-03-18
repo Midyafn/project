@@ -39,7 +39,7 @@ option = st.sidebar.selectbox(
 )
 
 if option == 'Home' or option == '':
-    st.title(""":blue[Prediksi dan Estimasi ]""")
+    st.title("""Prediksi dan Estimasi""")
     st.write("""### Penyinaran Matahari:mostly_sunny: & Kecepatan Angin:cyclone:""") #menampilkan halaman utama
     st.text("Lokasi Pengamatan")
     st.map(df_geo)
