@@ -10,8 +10,8 @@ sns.set_style('darkgrid')
 matplotlib.rcParams['font.size'] = 14
 matplotlib.rcParams['figure.figsize'] = (9, 5)
 matplotlib.rcParams['figure.facecolor'] = '#00000000'
-import keras
-from keras.models import load_model
+#import keras
+#from keras.models import load_model
 warnings.simplefilter(action='ignore', category=FutureWarning)
 from datetime import datetime
 #import mpld3
@@ -113,7 +113,7 @@ elif option == 'Prediksi Matahari':
         X = X.reshape((X.shape[0], n_seq, n_steps, n_features))
 
         #Loading Model
-        model = load_model('assets/new_5feature_cnngru.h5')
+        #model = load_model('assets/new_5feature_cnngru.h5')
 
 
         #Testing Model
@@ -236,7 +236,7 @@ elif option == 'Prediksi Angin':
         X = X.reshape((X.shape[0], n_seq, n_steps, n_features))
 
         #Loading Model
-        model = load_model('assets/fulldata_cnn_bilstm.h5')
+        #model = load_model('assets/fulldata_cnn_bilstm.h5')
         #Testing Model
         predictions = model.predict(X).flatten()
 
