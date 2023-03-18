@@ -15,7 +15,6 @@ from keras.models import load_model
 warnings.simplefilter(action='ignore', category=FutureWarning)
 from datetime import datetime
 #import mpld3
-import streamlit.components.v1 as components
 import datetime
 
 
