@@ -10,8 +10,8 @@ sns.set_style('darkgrid')
 matplotlib.rcParams['font.size'] = 14
 matplotlib.rcParams['figure.figsize'] = (9, 5)
 matplotlib.rcParams['figure.facecolor'] = '#00000000'
-import keras
-from keras.models import load_model
+import tensorflow as tf
+from tensorflow import keras
 warnings.simplefilter(action='ignore', category=FutureWarning)
 from datetime import datetime
 #import mpld3
@@ -113,7 +113,7 @@ elif option == 'Prediksi Matahari':
         X = X.reshape((X.shape[0], n_seq, n_steps, n_features))
 
         #Loading Model
-        model = load_model('assets/new_5feature_cnngru.h5')
+        model = keras.models.load_model('assets/new_5feature_cnngru.h5')
 
 
         #Testing Model
@@ -236,7 +236,7 @@ elif option == 'Prediksi Angin':
         X = X.reshape((X.shape[0], n_seq, n_steps, n_features))
 
         #Loading Model
-        model = load_model('assets/fulldata_cnn_bilstm.h5')
+        model = keras.models.load_model('assets/fulldata_cnn_bilstm.h5')
         #Testing Model
         predictions = model.predict(X).flatten()
 
@@ -330,11 +330,13 @@ elif option == 'Estimasi':
     regression = pickle.load(open("assets/estimasi_angin.pickle", "rb"))
 
     estimation = regression.predict([[a, b, c]])
+    estimation = estimation[0]
+    result = round(estimation, 2)
     st.text("Hasil Estimasi Kecepatan Angin hari berikutnya (m/s) :")
     if a == 0 or b == 0 or c==0:
         st.text("0")
     else:
-        st.text(estimation)
+        st.text(result)
 
 
     st.write(""" """) 
@@ -348,8 +350,10 @@ elif option == 'Estimasi':
     regression_sun = pickle.load(open("assets/estimasi_matahari.pickle", "rb"))
 
     estimation_sun = regression_sun.predict([[d, e, f]])
+    estimation_sun = estimation_sun[0]
+    result_sun = round(estimation_sun, 2)
     st.text("Hasil Estimasi Penyinaran Matahari hari berikutnya (jam) :")
-    if d == 0 or e == 0 or f==0:
+    if d == 0 or e == 0:
         st.text("0") 
     else:
-        st.text(estimation_sun)
+        st.text(result_sun)
