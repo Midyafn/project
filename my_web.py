@@ -48,7 +48,7 @@ elif option == 'Prediksi Matahari':
     st.title("Prediksi Penyinaran Matahari") #menampilkan judul halaman 
 
     #download template
-    st.write("- prediksi yang dilakukan membutuhkan data sebanyak jumlah prediksi yang diinginkan ditambah 1 bulan")
+    st.write("- prediksi yang dilakukan membutuhkan data sebanyak jumlah prediksi yang diinginkan ditambah 1 bulan sebelumnya")
     st.write("- untuk memulai proses prediksi, silahkan download template terlebih dahulu")
     st.write("")
     st.text("") 
@@ -170,7 +170,7 @@ elif option == 'Prediksi Angin':
     st.title("Prediksi Kecepatan Angin") #menampilkan judul halaman 
 
     #download template
-    st.write("- prediksi yang dilakukan membutuhkan data sebanyak jumlah prediksi yang diinginkan ditambah 1 bulan")
+    st.write("- prediksi yang dilakukan membutuhkan data sebanyak jumlah prediksi yang diinginkan ditambah 1 bulan sebelumnya")
     st.write("- untuk memulai proses prediksi, silahkan download template terlebih dahulu")
     st.write("")
     st.text("") 
