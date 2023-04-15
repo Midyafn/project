@@ -1,1 +1,2 @@
-﻿Tanggal,suhu_max,matahari,angin_max,angin
+﻿Tanggal(Y-M-D),suhu_max,suhu_rata_rata,kelembaban(%),matahari,angin_max,derajat_angin,angin,
+2000-01-01,30,27,85,8,9,270,3,baris ini dapat dihapus
