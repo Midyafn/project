@@ -222,8 +222,7 @@ elif option == 'Prediksi Angin':
             #from sklearn.model_selection import train_test_split
             X= df2.drop('angin_x', axis=1)
             y= df2['angin_x']
-            
-            st.write(df2) 
+             
             #minmaxscaler
             from sklearn.preprocessing import MinMaxScaler
             scaler = MinMaxScaler()
