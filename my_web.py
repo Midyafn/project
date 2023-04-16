@@ -39,7 +39,7 @@ option = st.sidebar.selectbox(
 )
 
 if option == 'Home' or option == '':
-    st.title("""[Prediksi dan Estimasi]""")
+    st.title("""Prediksi dan Estimasi""")
     st.write("""### Penyinaran Matahari:mostly_sunny: & Kecepatan Angin:cyclone:""") #menampilkan halaman utama
     st.text("Lokasi Pengamatan")
     st.map(df_geo)
@@ -253,7 +253,7 @@ elif option == 'Prediksi Angin':
             st.write("\n")
             st.write("\n")
         #menampilkan hasil prediksi dalam bentuk tabel
-            st.header('Prediksi rata-rata harian GRU')
+            st.header('Prediksi rata-rata harian dengan GRU')
 
         #menyimpan data prediksi
             pred = pd.DataFrame(pred, columns =['prediksi (m/s)'])
